@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "org.jetbrains.kotlin.jvm" version "2.2.21"
+    id "org.jetbrains.kotlin.jvm" version "2.4.21"
     id "base.base-conventions"
     id "base.application-conventions"
     id "base.fill-build-constants"
@@ -93,12 +93,12 @@ dependencies {
         exclude group: "org.slf4j", module: "slf4j-api"
     }
     includeInJar "org.spongepowered:mixin:0.8.7"
-    includeInJar "org.ow2.asm:asm:9.9"
-    includeInJar "org.ow2.asm:asm-tree:9.9"
-    includeInJar "org.ow2.asm:asm-analysis:9.9"
-    includeInJar "org.ow2.asm:asm-commons:9.9"
-    includeInJar "org.ow2.asm:asm-util:9.9"
-    includeInJar "org.jetbrains.kotlin:kotlin-stdlib:2.2.21"
+    includeInJar "org.ow2.asm:asm:9.11.1"
+    includeInJar "org.ow2.asm:asm-tree:9.11.1"
+    includeInJar "org.ow2.asm:asm-analysis:9.11.1"
+    includeInJar "org.ow2.asm:asm-commons:9.11.1"
+    includeInJar "org.ow2.asm:asm-util:9.11.1"
+    includeInJar "org.jetbrains.kotlin:kotlin-stdlib:2.4.21"
     includeInJar "net.lenni0451:Reflect:1.6.4"
     includeInJar "net.lenni0451:LambdaEvents:2.4.2"
     includeInJar("net.lenni0451:MCPing:1.4.5-20260920.192552-4") {
