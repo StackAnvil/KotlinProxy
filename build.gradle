@@ -1,0 +1,170 @@
+plugins {
+    id "java"
+    id "org.jetbrains.kotlin.jvm" version "2.2.21"
+    id "base.base-conventions"
+    id "base.application-conventions"
+    id "base.fill-build-constants"
+    id "viaproxy.publishing-conventions"
+    id "net.raphimc.class-token-replacer" version "1.1.7"
+    id "xyz.wagyourtail.jvmdowngrader" version "2.0.1"
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+configurations {
+    includeInJarJ8
+}
+
+repositories {
+    maven {
+        name = "ViaVersion"
+        url = "https://repo.viaversion.com"
+
+        content {
+            includeGroupByRegex "com\\.viaversion(\\..+)?"
+            includeGroupByRegex "net\\.raphimc(\\..+)?"
+        }
+    }
+    maven {
+        name = "Lenni0451"
+        url = "https://maven.lenni0451.net/everything"
+
+        content {
+            includeGroupByRegex "net\\.lenni0451(\\..+)?"
+            includeGroupByRegex "net\\.raphimc(\\..+)?"
+        }
+    }
+    maven {
+        name = "OpenCollab Snapshots"
+        url = "https://repo.opencollab.dev/maven-snapshots"
+
+        content {
+            includeGroupByRegex "org\\.cloudburstmc\\..+"
+            includeGroup "dev.opencollab"
+        }
+    }
+    maven {
+        name = "Minecraft Libraries"
+        url = "https://libraries.minecraft.net"
+
+        content {
+            includeGroup "com.mojang"
+        }
+    }
+    maven {
+        name = "Jitpack"
+        url = "https://jitpack.io"
+
+        content {
+            includeGroupByRegex "com\\.github\\..+"
+        }
+    }
+    maven {
+        name = "Sponge"
+        url = "https://repo.spongepowered.org/repository/maven-public/"
+
+        content {
+            includeGroup "org.spongepowered"
+        }
+    }
+}
+
+dependencies {
+    includeInJar "com.viaversion:viaversion-common:5.12.3-SNAPSHOT"
+    includeInJar "com.viaversion:viabackwards-common:5.12.3-SNAPSHOT"
+    includeInJar "com.viaversion:viarewind-common:4.2.1-SNAPSHOT"
+    includeInJar "net.raphimc:ViaLegacy:3.1.1-SNAPSHOT"
+    includeInJar "com.viaversion:viaaprilfools-common:4.2.4-SNAPSHOT"
+    includeInJar "net.raphimc:ViaBedrock:0.0.32-20261030.114258-1"
+
+    includeInJar "com.google.guava:guava:33.7.2-jre"
+    includeInJar "com.google.code.gson:gson:2.15.0"
+    includeInJar "com.formdev:flatlaf:3.7.2"
+    includeInJar "com.formdev:flatlaf-extras:3.7.2"
+    includeInJar "org.apache.commons:commons-lang3:3.21.0"
+    includeInJar "commons-io:commons-io:2.22.0"
+    includeInJar "net.sf.jopt-simple:jopt-simple:5.0.4"
+    includeInJar "org.apache.logging.log4j:log4j-core:2.26.1"
+    includeInJar "org.apache.logging.log4j:log4j-slf4j2-impl:2.26.1"
+    includeInJar "org.jline:jansi:4.4.8"
+    includeInJar("com.mojang:authlib:6.0.58") {
+        exclude group: "org.slf4j", module: "slf4j-api"
+    }
+    includeInJar "org.spongepowered:mixin:0.8.7"
+    includeInJar "org.ow2.asm:asm:9.9"
+    includeInJar "org.ow2.asm:asm-tree:9.9"
+    includeInJar "org.ow2.asm:asm-analysis:9.9"
+    includeInJar "org.ow2.asm:asm-commons:9.9"
+    includeInJar "org.ow2.asm:asm-util:9.9"
+    includeInJar "org.jetbrains.kotlin:kotlin-stdlib:2.2.21"
+    includeInJar "net.lenni0451:Reflect:1.6.4"
+    includeInJar "net.lenni0451:LambdaEvents:2.4.2"
+    includeInJar("net.lenni0451:MCPing:1.4.5-20260920.192552-4") {
+        exclude group: "com.google.code.gson", module: "gson"
+    }
+    includeInJar "net.lenni0451.commons:swing:1.9.2"
+    includeInJar "net.lenni0451.commons:brigadier:1.9.2"
+    includeInJar "net.lenni0451.commons:unchecked:1.9.2"
+    includeInJar("net.raphimc.netminecraft:all:3.1.7") {
+        exclude group: "com.google.code.gson", module: "gson"
+    }
+    includeInJar("io.netty:netty-codec-haproxy:4.2.19.Final") {
+        transitive = false
+    }
+    includeInJar("io.netty:netty-handler-proxy:4.2.19.Final") {
+        transitive = false
+    }
+    includeInJar("io.netty:netty-codec-socks:4.2.19.Final") {
+        transitive = false
+    }
+    includeInJar("net.raphimc:MinecraftAuth:5.0.3-20260923.192703-2") {
+        exclude group: "com.google.code.gson", module: "gson"
+    }
+    includeInJar("org.cloudburstmc.netty:netty-transport-nethernet:2.0.0.CR4-20261001.235918-13") {
+        exclude group: "io.netty"
+        exclude group: "org.bouncycastle"
+        exclude group: "dev.opencollab:libdatachannel-java"
+    }
+    includeInJar "dev.opencollab:libdatachannel-java-arch-detect:0.24.6.0-20260930.214316-2"
+    includeInJar "gs.mclo:api:6.2.1"
+    includeInJar "net.lenni0451:optconfig:1.1.1"
+
+    includeInJarJ8(compileOnly("xyz.wagyourtail.jvmdowngrader:jvmdowngrader:2.0.1"))
+    includeInJarJ8 "xyz.wagyourtail.jvmdowngrader:jvmdowngrader-java-api:2.0.1:downgraded-8"
+}
+
+application {
+    mainClass = "net.raphimc.viaproxy.ViaProxy"
+}
+
+jar {
+    manifest {
+        attributes(
+                "Launcher-Agent-Class": application.mainClass,
+                "Premain-Class": application.mainClass,
+                "Can-Retransform-Classes": "true"
+        )
+    }
+}
+
+downgradeJar {
+    dependsOn(configurations.includeInJarJ8)
+    from {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        configurations.includeInJarJ8.collect {
+            zipTree(it)
+        }
+    } {
+        exclude "META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA"
+    }
+
+    downgradeTo = JavaVersion.VERSION_1_8
+    ignoreWarningsIn.add("net/lenni0451/commons/httpclient/executor/HttpClientExecutor")
+    archiveClassifier = null
+    archiveVersion = project.version + "+java8"
+}
+build.finalizedBy("downgradeJar")
+
+tasks.javadoc.enabled = false

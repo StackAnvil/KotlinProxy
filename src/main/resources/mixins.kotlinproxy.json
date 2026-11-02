@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.raphimc.viaproxy.injection.mixins",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MixinBlockItemPacketRewriter1_20_5",
+    "MixinBlockItemPacketRewriter1_21_11",
+    "MixinBlockItemPacketRewriter1_21_4",
+    "MixinC2SHandshakingClientIntentionPacket",
+    "MixinCommonBoss",
+    "MixinEntityPacketRewriter1_17",
+    "MixinEntityPacketRewriter1_20_5",
+    "MixinEntityTracker1_9",
+    "MixinItemPacketRewriter1_9",
+    "MixinPluginManager",
+    "MixinProtocol1_18To1_18_2",
+    "MixinProtocol1_20To1_20_2",
+    "MixinViaLegacyConfig",
+    "MixinWorldPacketRewriter1_16_2",
+    "MixinWorldPacketRewriter1_17"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
