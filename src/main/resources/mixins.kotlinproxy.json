@@ -2,7 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.raphimc.viaproxy.injection.mixins",
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_8",
   "mixins": [
     "MixinBlockItemPacketRewriter1_20_5",
     "MixinBlockItemPacketRewriter1_21_11",

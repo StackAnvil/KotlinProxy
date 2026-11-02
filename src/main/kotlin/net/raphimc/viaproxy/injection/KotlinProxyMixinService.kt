@@ -20,8 +20,8 @@ package net.raphimc.viaproxy.injection
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.launch.platform.container.IContainerHandle
 import org.spongepowered.asm.mixin.MixinEnvironment
-import org.spongepowered.asm.mixin.transformer.IMixinAuditTrail
 import org.spongepowered.asm.mixin.transformer.IMixinTransformerFactory
+import org.spongepowered.asm.service.IMixinAuditTrail
 import org.spongepowered.asm.service.IClassBytecodeProvider
 import org.spongepowered.asm.service.IClassProvider
 import org.spongepowered.asm.service.IClassTracker
@@ -44,9 +44,6 @@ import java.net.URLClassLoader
 class KotlinProxyMixinService : MixinServiceAbstract() {
 
     companion object {
-        @JvmStatic
-        val instance: KotlinProxyMixinService by lazy { KotlinProxyMixinService() }
-
         private val classLoader: ClassLoader = KotlinProxyMixinService::class.java.classLoader
     }
 
@@ -81,7 +78,7 @@ class KotlinProxyMixinService : MixinServiceAbstract() {
         }
     }
 
-    private val primaryContainer = object : IContainerHandle {
+    val containerHandle = object : IContainerHandle {
         override fun getId(): String = "kotlinproxy"
 
         override fun getDescription(): String = "KotlinProxy standalone mixin container"
@@ -111,7 +108,7 @@ class KotlinProxyMixinService : MixinServiceAbstract() {
 
     override fun getPlatformAgents(): Collection<String> = emptyList()
 
-    override fun getPrimaryContainer(): IContainerHandle = primaryContainer
+    override fun getPrimaryContainer(): IContainerHandle = containerHandle
 
     override fun getResourceAsStream(name: String): InputStream? = classLoader.getResourceAsStream(name)
 

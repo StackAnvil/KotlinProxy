@@ -21,10 +21,8 @@ import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
 import org.spongepowered.asm.mixin.Mixins
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer
+import net.raphimc.viaproxy.bootstrap.MixinHook
 import org.spongepowered.asm.service.MixinService
-import java.lang.instrument.ClassFileTransformer
-import java.lang.instrument.Instrumentation
-import java.security.ProtectionDomain
 
 /**
  * Boots the SpongePowered Mixin subsystem and installs its transformer.
@@ -32,13 +30,6 @@ import java.security.ProtectionDomain
 object MixinManager {
 
     const val MIXIN_CONFIG = "mixins.kotlinproxy.json"
-
-    private val TRANSFORMED_PACKAGES = arrayOf(
-        "net/raphimc/",
-        "com/viaversion/",
-        "com/github/",
-        "org/cloudburstmc/"
-    )
 
     @Volatile
     private var transformer: IMixinTransformer? = null
@@ -51,59 +42,41 @@ object MixinManager {
         }
 
         MixinBootstrap.init()
-        val environment = MixinEnvironment.getDefaultEnvironment()
+        val service = MixinService.getService() as KotlinProxyMixinService
+        Mixins.addConfiguration(MIXIN_CONFIG, service.containerHandle)
+        gotoDefaultPhase()
 
+        val environment = MixinEnvironment.getDefaultEnvironment()
         var active = environment.activeTransformer as? IMixinTransformer
         if (active == null) {
-            val service = MixinService.getService() as KotlinProxyMixinService
             val factory = service.transformerFactory
                 ?: throw IllegalStateException("Mixin transformer factory was not offered by the service")
             active = factory.createTransformer()
         }
-
-        Mixins.addConfiguration(MIXIN_CONFIG)
         this.transformer = active
+        MixinHook.transformer = MixinHook.Transformer { className, classBytes -> transform(className, classBytes) }
+        MixinHook.generator = MixinHook.Generator { className -> generateClass(className) }
+    }
+
+    private fun gotoDefaultPhase() {
+        val method = MixinEnvironment::class.java.getDeclaredMethod(
+            "gotoPhase",
+            MixinEnvironment.Phase::class.java
+        )
+        method.isAccessible = true
+        method.invoke(null, MixinEnvironment.Phase.DEFAULT)
     }
 
     @JvmStatic
-    fun transform(className: String, classBytes: ByteArray): ByteArray? =
-        this.transformer?.transformClassBytes(className, className, classBytes)
-
-    @JvmStatic
-    fun shouldTransform(className: String): Boolean =
-        TRANSFORMED_PACKAGES.any { className.startsWith(it) }
-
-    @JvmStatic
-    fun installMixins(instrumentation: Instrumentation) {
-        initialize()
-        instrumentation.addTransformer(KotlinProxyClassTransformer(), true)
+    fun transform(className: String, classBytes: ByteArray): ByteArray? {
+        val dottedName = className.replace('/', '.')
+        return this.transformer?.transformClassBytes(dottedName, dottedName, classBytes)
     }
 
-}
-
-class KotlinProxyClassTransformer : ClassFileTransformer {
-
-    override fun transform(
-        loader: ClassLoader?,
-        className: String?,
-        classBeingRedefined: Class<*>?,
-        protectionDomain: ProtectionDomain?,
-        classfileBuffer: ByteArray?
-    ): ByteArray? {
-        if (className == null || classfileBuffer == null) {
-            return null
-        }
-        if (!MixinManager.shouldTransform(className)) {
-            return null
-        }
-
-        return try {
-            MixinManager.transform(className, classfileBuffer)
-        } catch (throwable: Throwable) {
-            System.err.println("Failed to apply mixins to $className")
-            throwable.printStackTrace()
-            null
-        }
+    @JvmStatic
+    fun generateClass(className: String): ByteArray? {
+        val dottedName = className.replace('/', '.')
+        return this.transformer?.transformClassBytes(dottedName, dottedName, null)
     }
 
 }

@@ -136,15 +136,13 @@ dependencies {
 }
 
 application {
-    mainClass = "net.raphimc.viaproxy.ViaProxy"
+    mainClass = "net.raphimc.viaproxy.KotlinProxyLauncher"
 }
 
 jar {
     manifest {
         attributes(
-                "Launcher-Agent-Class": application.mainClass,
-                "Premain-Class": application.mainClass,
-                "Can-Retransform-Classes": "true"
+                "Main-Class": application.mainClass
         )
     }
 }
@@ -168,3 +166,20 @@ downgradeJar {
 build.finalizedBy("downgradeJar")
 
 tasks.javadoc.enabled = false
+
+def javaSources = layout.projectDirectory.asFileTree.matching { include "src/**/*.java" }
+
+tasks.register("checkNoJavaSources") {
+    group = "verification"
+    description = "Fails when a Java source file is present."
+    def sources = javaSources
+    doLast {
+        if (!sources.isEmpty()) {
+            throw new GradleException("KotlinProxy must not contain Java sources: " + sources.files)
+        }
+    }
+}
+
+tasks.named("check") {
+    dependsOn("checkNoJavaSources")
+}

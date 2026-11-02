@@ -1,0 +1,71 @@
+/*
+ * This file is part of KotlinProxy - https://github.com/StackAnvil/KotlinProxy
+ * Copyright (C) 2021-2026 RK_01/RaphiMC and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package net.raphimc.viaproxy.proxy.client2proxy
+
+import com.viaversion.viaversion.platform.ViaChannelInitializer
+import io.netty.channel.Channel
+import io.netty.channel.ChannelHandler
+import io.netty.handler.codec.haproxy.HAProxyMessageDecoder
+import net.raphimc.netminecraft.constants.MCPipeline
+import net.raphimc.netminecraft.netty.codec.NoReadFlowControlHandler
+import net.raphimc.netminecraft.netty.connection.MinecraftChannelInitializer
+import net.raphimc.netminecraft.packet.registry.DefaultPacketRegistry
+import net.raphimc.viaproxy.ViaProxy
+import net.raphimc.viaproxy.plugins.events.Client2ProxyChannelInitializeEvent
+import net.raphimc.viaproxy.plugins.events.types.ITyped
+import net.raphimc.viaproxy.protocoltranslator.impl.ViaProxyViaCodec
+import net.raphimc.viaproxy.proxy.client2proxy.passthrough.LegacyPassthroughInitialHandler
+import java.util.function.Supplier
+
+open class Client2ProxyChannelInitializer(
+    handlerSupplier: Supplier<ChannelHandler>
+) : MinecraftChannelInitializer(handlerSupplier) {
+
+    companion object {
+        const val VIAPROXY_HAPROXY_DECODER_NAME = "viaproxy-haproxy-decoder"
+        const val VIAPROXY_HAPROXY_HANDLER_NAME = "viaproxy-haproxy-handler"
+        const val LEGACY_PASSTHROUGH_INITIAL_HANDLER_NAME = "legacy-passthrough-initial-handler"
+    }
+
+    protected override fun initChannel(channel: Channel) {
+        if (ViaProxy.EVENT_MANAGER.call(Client2ProxyChannelInitializeEvent(ITyped.Type.PRE, channel, false)).isCancelled()) {
+            channel.close()
+            return
+        }
+
+        if (ViaProxy.getConfig().useFrontendHaProxy()) {
+            channel.pipeline().addLast(VIAPROXY_HAPROXY_DECODER_NAME, HAProxyMessageDecoder())
+            channel.pipeline().addLast(VIAPROXY_HAPROXY_HANDLER_NAME, HAProxyHandler())
+        }
+        if (ViaProxy.getConfig().shouldAllowLegacyClientPassthrough()) {
+            channel.pipeline().addLast(LEGACY_PASSTHROUGH_INITIAL_HANDLER_NAME, LegacyPassthroughInitialHandler())
+        }
+
+        super.initChannel(channel)
+        channel.attr(MCPipeline.PACKET_REGISTRY_ATTRIBUTE_KEY).set(DefaultPacketRegistry(false, -1))
+
+        val user = ViaChannelInitializer.createUserConnection(channel, false)
+        channel.pipeline().addBefore(MCPipeline.PACKET_CODEC_HANDLER_NAME, ViaProxyViaCodec.NAME, ViaProxyViaCodec(user))
+        channel.pipeline().addAfter(ViaProxyViaCodec.NAME, "via-" + MCPipeline.FLOW_CONTROL_HANDLER_NAME, NoReadFlowControlHandler())
+
+        if (ViaProxy.EVENT_MANAGER.call(Client2ProxyChannelInitializeEvent(ITyped.Type.POST, channel, false)).isCancelled()) {
+            channel.close()
+        }
+    }
+
+}

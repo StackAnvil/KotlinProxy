@@ -7,13 +7,13 @@ publishing {
     publications {
         mavenJava {
             pom {
-                name = "ViaProxy"
-                description = "Standalone proxy which allows players to join EVERY Minecraft server version (Classic, Alpha, Beta, Release, Bedrock)"
-                url = "https://github.com/ViaVersion/ViaProxy"
+                name = "KotlinProxy"
+                description = "Kotlin standalone proxy which allows players to join EVERY Minecraft server version (Classic, Alpha, Beta, Release, Bedrock)"
+                url = "https://github.com/StackAnvil/KotlinProxy"
                 licenses {
                     license {
                         name = "GPL-3.0 License"
-                        url = "https://github.com/ViaVersion/ViaProxy/blob/main/LICENSE"
+                        url = "https://github.com/StackAnvil/KotlinProxy/blob/main/LICENSE"
                     }
                 }
                 developers {
@@ -22,9 +22,9 @@ publishing {
                     }
                 }
                 scm {
-                    connection = "scm:git:git://github.com/ViaVersion/ViaProxy.git"
-                    developerConnection = "scm:git:ssh://github.com/ViaVersion/ViaProxy.git"
-                    url = "https://github.com/ViaVersion/ViaProxy.git"
+                    connection = "scm:git:git://github.com/StackAnvil/KotlinProxy.git"
+                    developerConnection = "scm:git:ssh://github.com/StackAnvil/KotlinProxy.git"
+                    url = "https://github.com/StackAnvil/KotlinProxy.git"
                 }
             }
         }
